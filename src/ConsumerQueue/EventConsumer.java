@@ -15,9 +15,12 @@ public class EventConsumer extends Thread
             while(true)
             {
                 Event event = queue.consume();//consumer asks queue for event
-                System.out.println(Thread.currentThread().getName()+" processed "+event.getMessage());
+                if(event==null)
+                    break;//exists is queue is shutdown
+                System.out.println(Thread.currentThread().getName()+" processed "+event.getType()+":"+event.getMessage());
                 Thread.sleep(500);
             }
+            System.out.println(Thread.currentThread().getName()+ " exited gracefully.");
         }
         catch(InterruptedException e)
         {
