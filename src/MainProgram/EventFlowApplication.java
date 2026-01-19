@@ -13,6 +13,10 @@ public class EventFlowApplication
         EventConsumer consumer1=new EventConsumer(queue);
         EventConsumer consumer2=new EventConsumer(queue);
 
+        producer.setName("Producer");
+        consumer1.setName("Consumer-1");
+        consumer2.setName("Consumer-2");
+
         producer.start();
         consumer1.start();
         consumer2.start();

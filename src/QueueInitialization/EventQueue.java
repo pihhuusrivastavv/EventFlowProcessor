@@ -25,7 +25,7 @@ public class EventQueue
         {
             wait();//Consumer waits if queue is empty and shutdown
         }
-        while(queue.isEmpty() && shutdown)
+        if(queue.isEmpty() && shutdown)
         {
             return null;//signals consumer thread to exit
         }

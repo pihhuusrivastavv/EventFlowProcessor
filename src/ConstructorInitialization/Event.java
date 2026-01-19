@@ -1,6 +1,6 @@
 package ConstructorInitialization;
-
-public class Event
+import java.lang.Comparable;
+public class Event implements Comparable<Event>
 {
     private final int id;
     private final String msg;
@@ -23,5 +23,10 @@ public class Event
     public EventType getType()
     {
         return type;
+    }
+    @Override
+    public int compareTo(Event otherEvent)
+    {
+        return Integer.compare(otherEvent.type.getPriority(),this.type.getPriority());
     }
 }

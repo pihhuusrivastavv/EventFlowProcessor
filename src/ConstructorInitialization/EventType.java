@@ -2,7 +2,16 @@ package ConstructorInitialization;
 
 public enum EventType
 {
-    INFO,
-    WARNING,
-    ERROR
+    INFO(1),
+    WARNING(2),
+    ERROR(3);
+    private final int priority;
+    EventType( int priority)
+    {
+        this.priority=priority;
+    }
+    public int getPriority()
+    {
+        return priority;
+    }
 }

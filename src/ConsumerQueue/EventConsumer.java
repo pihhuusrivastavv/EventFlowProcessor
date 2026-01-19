@@ -8,6 +8,7 @@ public class EventConsumer extends Thread
     {
         this.queue=queue;
     }
+    @Override
     public void run()
     {
         try
