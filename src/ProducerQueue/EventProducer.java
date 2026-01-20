@@ -3,6 +3,7 @@ import  ConstructorInitialization.Event;
 import ConstructorInitialization.EventType;
 import QueueInitialization.EventQueue;
 import java.util.Random;
+import java.util.logging.Logger;
 import FileStorage.EventFileInformationStore;
 public class EventProducer extends Thread
 {
@@ -10,6 +11,7 @@ public class EventProducer extends Thread
     private final Random random= new Random();
     private int eventNumber=1;
     private final EventFileInformationStore file_info;
+    private static final Logger logger=Logger.getLogger(EventProducer.class.getName());
 
     public EventProducer(EventQueue queue)
     {
@@ -28,10 +30,11 @@ public class EventProducer extends Thread
                 if(file_info.persist(event))//persist first for durability
                 {
                     queue.publish(event);
+                    logger.info("Produced Event: "+event.getType()+":"+event.getMessage());
                 }
                 else
                 {
-                    System.out.println("Event Dropped due to persistence: "+event);
+                    logger.severe("Event Dropped due to persistence: "+event);
                 }
                 eventNumber++;
                 Thread.sleep(500);
@@ -40,7 +43,7 @@ public class EventProducer extends Thread
         }
         catch(InterruptedException e)
         {
-            e.printStackTrace();
+            logger.warning("Producer interrupted,exiting...");
         }
     }
 }

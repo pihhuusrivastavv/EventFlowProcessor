@@ -3,11 +3,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 import ConstructorInitialization.Event;
+import java.util.logging.Logger;
 public class EventQueue
 {
     private final Queue<Event>queue =new LinkedList<>();
     private final int capacity=5;
-    private boolean shutdown=false;//to shutdown
+    private boolean shutdown=false;//shutdown
+    private static final Logger logger=Logger.getLogger(EventQueue.class.getName());
 
     public synchronized void publish(Event event) throws InterruptedException //producer adds event to queue
     {
@@ -16,7 +18,7 @@ public class EventQueue
             wait();//producer waits
         }
         queue.add(event);
-        System.out.println("Produced Event: "+ event.getMessage());
+        logger.info("Produced Event: "+ event.getMessage());
         notifyAll();
     }
     public synchronized  Event consume() throws InterruptedException //consumer removes event from queue

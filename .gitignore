@@ -29,3 +29,11 @@ bin/
 .DS_Store
 .idea/
 *.iml
+
+
+*.log
+events_info
+*.class
+.idea/
+out/
+
