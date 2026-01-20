@@ -16,6 +16,12 @@ public class EventFlowApplication
         producer.setName("Producer");
         consumer1.setName("Consumer-1");
         consumer2.setName("Consumer-2");
+        Runtime.getRuntime().addShutdownHook((new Thread(()->
+        {
+            System.out.println("Shutdown initiated..");
+            producer.interrupt();
+            queue.shutDownQueue();
+        })));
 
         producer.start();
         consumer1.start();

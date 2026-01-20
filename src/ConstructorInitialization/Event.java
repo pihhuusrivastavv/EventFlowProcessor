@@ -29,4 +29,8 @@ public class Event implements Comparable<Event>
     {
         return Integer.compare(otherEvent.type.getPriority(),this.type.getPriority());
     }
+    public String toString()
+    {
+        return id+"|"+msg;
+    }
 }
