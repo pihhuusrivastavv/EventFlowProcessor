@@ -2,6 +2,7 @@ package ConsumerQueue;
 import ConstructorInitialization.Event;
 import QueueInitialization.EventQueue;
 import java.util.logging.Logger;
+import DeadLetterQueue.DeadAndFailedEventStore;
 import java.util.Random;
 
 public class EventConsumer extends Thread
@@ -11,6 +12,7 @@ public class EventConsumer extends Thread
     private final Random random=new Random();
     private static final int max_retries=3;
     private static final Logger logger=Logger.getLogger(EventConsumer.class.getName());
+    private final DeadAndFailedEventStore deadEvents=new DeadAndFailedEventStore();
     public EventConsumer(EventQueue queue)
     {
         this.queue=queue;
@@ -24,7 +26,7 @@ public class EventConsumer extends Thread
             {
                 Event event = queue.consume();//consumer asks queue for event
                 if(event==null)
-                    break;//exists is queue is shutdown
+                    break;//exists if queue is shutdown
                 int attempt=0;
                 boolean success=false;
                 while(attempt<max_retries && !success) {
@@ -41,7 +43,8 @@ public class EventConsumer extends Thread
                             logger.warning(Thread.currentThread().getName() + " failed processing " + event.getType() + ":" + "| attempt " + attempt);
 
                             if (attempt == max_retries) {
-                                logger.severe(Thread.currentThread().getName() + " is now being dropped" + event.getType() + ":" + event.getMessage());
+                                logger.severe(Thread.currentThread().getName() + " sending to DLQ file " + event.getType() + ":" + event.getMessage());
+                                deadEvents.persistDeadEvents(event,Thread.currentThread().getName(),"Processing failed after "+max_retries+" retries");
                             }
                         }
                     }
