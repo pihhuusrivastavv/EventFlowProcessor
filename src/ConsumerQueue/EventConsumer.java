@@ -4,6 +4,7 @@ import QueueInitialization.EventQueue;
 import java.util.logging.Logger;
 import DeadLetterQueue.DeadAndFailedEventStore;
 import java.util.Random;
+import QueueInitialization.ConfirmedEventStore;
 
 public class EventConsumer extends Thread
 {
@@ -13,6 +14,8 @@ public class EventConsumer extends Thread
     private static final int max_retries=3;
     private static final Logger logger=Logger.getLogger(EventConsumer.class.getName());
     private final DeadAndFailedEventStore deadEvents=new DeadAndFailedEventStore();
+    private final ConfirmedEventStore confirmStore=new ConfirmedEventStore();
+
     public EventConsumer(EventQueue queue)
     {
         this.queue=queue;
@@ -27,6 +30,11 @@ public class EventConsumer extends Thread
                 Event event = queue.consume();//consumer asks queue for event
                 if(event==null)
                     break;//exists if queue is shutdown
+                if(confirmStore.isConfirmed(event.getId()))
+                {
+                    logger.info("Skipping already confirmed Event "+event.getId());
+                    continue;
+                }
                 int attempt=0;
                 boolean success=false;
                 while(attempt<max_retries && !success) {
@@ -36,6 +44,9 @@ public class EventConsumer extends Thread
 
                         logger.info(Thread.currentThread().getName() + " processed " + event.getType() + ":" + event.getMessage());
                         success = true;
+
+                        confirmStore.confirmedEvent(event.getId());
+                        logger.info("Confirmation received for Event "+event.getId());
                     }
                 catch(Exception e)
                         {
