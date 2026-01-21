@@ -18,7 +18,7 @@ public class EventQueue
             wait();//producer waits
         }
         queue.add(event);
-        logger.info("Produced Event: "+ event.getMessage());
+        logger.info("Published event: "+ event.getMessage());
         notifyAll();
     }
     public synchronized  Event consume() throws InterruptedException //consumer removes event from queue

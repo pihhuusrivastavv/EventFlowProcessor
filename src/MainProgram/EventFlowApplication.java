@@ -1,4 +1,5 @@
 package MainProgram;
+import FileStorage.EventRecovery;
 import QueueInitialization.EventQueue;
 import ProducerQueue.EventProducer;
 import ConsumerQueue.EventConsumer;
@@ -10,7 +11,8 @@ public class EventFlowApplication
     public static void main(String[]args) throws InterruptedException
     {
         EventQueue queue=new EventQueue();
-
+        EventRecovery recovery=new EventRecovery();
+        recovery.loadEvents(queue);
         EventProducer producer=new EventProducer(queue);
         EventConsumer consumer1=new EventConsumer(queue);
         EventConsumer consumer2=new EventConsumer(queue);
