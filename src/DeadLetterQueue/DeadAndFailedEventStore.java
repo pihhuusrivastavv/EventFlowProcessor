@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
-import java.util.logging.Logger;
-
 public class DeadAndFailedEventStore
 {
     private static final String file_name="Dead.events.log";

@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.logging.Logger;
 public class EventStore
 {
-    private static final String file="event-store.log";
+    private static final String file="events.info";
     private final Logger logger=Logger.getLogger(EventStore.class.getName());
     public synchronized void store(Event event)
     {
-        try(FileWriter writer=new FileWriter(file))
+        try(FileWriter writer=new FileWriter(file,true))
         {
             String record= LocalDateTime.now()+" | "+event.getId()+" | "+event.getType()+" | "+event.getMessage()+"\n";
             writer.write(record);

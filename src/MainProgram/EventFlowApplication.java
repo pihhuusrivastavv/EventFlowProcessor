@@ -1,6 +1,7 @@
 package MainProgram;
 import FileStorage.EventRecovery;
 import QueueInitialization.EventQueue;
+import QueueInitialization.ConfirmedEventStore;
 import ProducerQueue.EventProducer;
 import ConsumerQueue.EventConsumer;
 import java.util.logging.Logger;
@@ -12,10 +13,11 @@ public class EventFlowApplication
     {
         EventQueue queue=new EventQueue();
         EventRecovery recovery=new EventRecovery();
-        recovery.loadEvents(queue);
+        ConfirmedEventStore confirmStore=new ConfirmedEventStore();
+        recovery.loadEvents(queue,confirmStore);
         EventProducer producer=new EventProducer(queue);
-        EventConsumer consumer1=new EventConsumer(queue);
-        EventConsumer consumer2=new EventConsumer(queue);
+        EventConsumer consumer1=new EventConsumer(queue,confirmStore);
+        EventConsumer consumer2=new EventConsumer(queue,confirmStore);
 
         producer.setName("Producer");
         consumer1.setName("Consumer-1");

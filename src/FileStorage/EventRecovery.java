@@ -1,6 +1,7 @@
 package FileStorage;
 import ConstructorInitialization.Event;
 import ConstructorInitialization.EventType;
+import QueueInitialization.ConfirmedEventStore;
 import QueueInitialization.EventQueue;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,9 +14,7 @@ public class EventRecovery
 {
     private final String file="events_info";
     private final Logger logger =Logger.getLogger(EventRecovery.class.getName());
-    private final Set<Integer> passedEventIds= new HashSet<>();
-
-    public void loadEvents(EventQueue queue)
+    public void loadEvents(EventQueue queue, ConfirmedEventStore confirmStore)
     {
         try(BufferedReader reader=new BufferedReader(new FileReader(file)))
         {
@@ -23,10 +22,12 @@ public class EventRecovery
             while((line=reader.readLine())!=null)
             {
                 Event event= parseEvent(line);
-                if(passedEventIds.contains(event.getId()))
+                if(confirmStore.isConfirmed(event.getId()))
+                {
+                    logger.info("Skipping Confirmed Event "+event.getId());
                     continue;
+                }
                 queue.publish(event);
-                passedEventIds.add(event.getId());
                 logger.info("Recovered event: "+event.getId());
             }
         }
@@ -39,9 +40,9 @@ public class EventRecovery
     private Event parseEvent(String line)
     {
         String[] part=line.split("\\|");
-        int id=Integer.parseInt(part[0]);
-        String msg= part[1];
-        EventType type=EventType.INFO;
+        EventType type=EventType.valueOf(part[1].trim());
+        int id=Integer.parseInt(part[2].trim());
+        String msg= part[3].trim();
 
         return new Event(id,msg,type);
     }

@@ -1,7 +1,6 @@
 package QueueInitialization;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.locks.ReentrantLock;
 import ConstructorInitialization.Event;
 import java.util.logging.Logger;
 public class EventQueue

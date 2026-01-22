@@ -18,7 +18,7 @@ public class EventConsumer extends Thread
     private final ConfirmedEventStore confirmStore=new ConfirmedEventStore();
     private final EventStore eventStore=new EventStore();
 
-    public EventConsumer(EventQueue queue)
+    public EventConsumer(EventQueue queue ,ConfirmedEventStore confirmStore)
     {
         this.queue=queue;
     }
@@ -67,7 +67,7 @@ public class EventConsumer extends Thread
                     else
                     {
                         eventStore.store(event);
-                        deadEvents.persistDeadEvents(event,Thread.currentThread().getName()+" Failed after: ",max_retries+" retries");
+                        deadEvents.persistDeadEvents(event,Thread.currentThread().getName()," Failed after: "+max_retries+" retries");
                         logger.severe("Event moved to DLQ: "+event.getId());
                     }
 
