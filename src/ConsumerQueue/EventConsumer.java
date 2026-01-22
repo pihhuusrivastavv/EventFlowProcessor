@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import DeadLetterQueue.DeadAndFailedEventStore;
 import java.util.Random;
 import QueueInitialization.ConfirmedEventStore;
+import StorageEvents.EventStore;
 
 public class EventConsumer extends Thread
 {
@@ -15,6 +16,7 @@ public class EventConsumer extends Thread
     private static final Logger logger=Logger.getLogger(EventConsumer.class.getName());
     private final DeadAndFailedEventStore deadEvents=new DeadAndFailedEventStore();
     private final ConfirmedEventStore confirmStore=new ConfirmedEventStore();
+    private final EventStore eventStore=new EventStore();
 
     public EventConsumer(EventQueue queue)
     {
@@ -46,19 +48,29 @@ public class EventConsumer extends Thread
                         success = true;
 
                         confirmStore.confirmedEvent(event.getId());
-                        logger.info("Confirmation received for Event "+event.getId());
-                    }
-                catch(Exception e)
-                        {
-                            attempt++;
-                            logger.warning(Thread.currentThread().getName() + " failed processing " + event.getType() + ":" + "| attempt " + attempt);
+                        logger.info("Confirmation received for Event " + event.getId());
+                    } catch (Exception e) {
+                        attempt++;
+                        logger.warning(Thread.currentThread().getName() + " failed processing " + event.getType() + ":" + "| attempt " + attempt);
 
-                            if (attempt == max_retries) {
-                                logger.severe(Thread.currentThread().getName() + " sending to DLQ file " + event.getType() + ":" + event.getMessage());
-                                deadEvents.persistDeadEvents(event,Thread.currentThread().getName(),"Processing failed after "+max_retries+" retries");
-                            }
+                        if (attempt == max_retries) {
+                            logger.severe(Thread.currentThread().getName() + " sending to DLQ file " + event.getType() + ":" + event.getMessage());
+                            deadEvents.persistDeadEvents(event, Thread.currentThread().getName(), "Processing failed after " + max_retries + " retries");
                         }
                     }
+                }
+                    if (success)
+                    {
+                        eventStore.store(event);
+                        logger.info("Event processed successfully: "+event.getId());
+                    }
+                    else
+                    {
+                        eventStore.store(event);
+                        deadEvents.persistDeadEvents(event,Thread.currentThread().getName()+" Failed after: ",max_retries+" retries");
+                        logger.severe("Event moved to DLQ: "+event.getId());
+                    }
+
                 Thread.sleep(500);
             }
             logger.info(Thread.currentThread().getName()+ " exited gracefully.");
