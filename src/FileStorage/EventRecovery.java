@@ -14,6 +14,8 @@ public class EventRecovery
 {
     private final String file="events_info";
     private final Logger logger =Logger.getLogger(EventRecovery.class.getName());
+    //private final Set<Integer> passedEventIds= new HashSet<>();
+
     public void loadEvents(EventQueue queue, ConfirmedEventStore confirmStore)
     {
         try(BufferedReader reader=new BufferedReader(new FileReader(file)))
@@ -40,9 +42,9 @@ public class EventRecovery
     private Event parseEvent(String line)
     {
         String[] part=line.split("\\|");
-        EventType type=EventType.valueOf(part[1].trim());
-        int id=Integer.parseInt(part[2].trim());
-        String msg= part[3].trim();
+        int id=Integer.parseInt(part[0]);
+        String msg= part[1];
+        EventType type=EventType.INFO;
 
         return new Event(id,msg,type);
     }

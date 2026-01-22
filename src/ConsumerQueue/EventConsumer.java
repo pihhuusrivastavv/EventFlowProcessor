@@ -15,12 +15,13 @@ public class EventConsumer extends Thread
     private static final int max_retries=3;
     private static final Logger logger=Logger.getLogger(EventConsumer.class.getName());
     private final DeadAndFailedEventStore deadEvents=new DeadAndFailedEventStore();
-    private final ConfirmedEventStore confirmStore=new ConfirmedEventStore();
+    private final ConfirmedEventStore confirmStore;
     private final EventStore eventStore=new EventStore();
 
     public EventConsumer(EventQueue queue ,ConfirmedEventStore confirmStore)
     {
         this.queue=queue;
+        this.confirmStore=confirmStore;
     }
     @Override
     public void run()
